@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SEEN</string>
+
+    <!-- Content warning -->
+    <string name="content_warning_title">Before you continue</string>
+    <string name="content_warning_body">This game depicts stalking as a crime in order to help you recognise it and respond to it. It contains themes of surveillance, obsessive behaviour, and psychological threat.\n\nNo violence is shown on screen. A \'Leave / Get help\' option is available at any time.</string>
+    <string name="content_warning_continue">I understand — continue</string>
+    <string name="content_warning_leave">Leave / get help</string>
+
+    <!-- Resources screen -->
+    <string name="resources_title">Get help</string>
+    <string name="resources_verify_note">Verify all contacts are current before relying on them.</string>
+
+    <!-- Navigation -->
+    <string name="nav_back">Back</string>
+    <string name="nav_help">Leave / get help</string>
+</resources>
