@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Help
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.BehaviorCard
 import com.example.seen.data.ContentRepository
 import com.example.seen.data.MiniGame
@@ -35,6 +37,7 @@ private const val SWIPE_THRESHOLD = 180f
 
 @Composable
 fun AffectionSwipe(vm: ProgressViewModel, onHelp: () -> Unit = {}, onComplete: () -> Unit) {
+    val sound = LocalSoundManager.current
     val deck = remember { ContentRepository.affectionDeck.shuffled() }
     var currentIndex by remember { mutableIntStateOf(0) }
     var redFlagsCorrect by remember { mutableIntStateOf(0) }
@@ -43,6 +46,7 @@ fun AffectionSwipe(vm: ProgressViewModel, onHelp: () -> Unit = {}, onComplete: (
     val isDone = currentIndex >= deck.size
 
     if (isDone) {
+        LaunchedEffect(Unit) { sound?.play(SoundEffect.MINIGAME_COMPLETE) }
         AffectionSummary(
             redFlagsFound = redFlagsCorrect,
             totalRedFlags = totalRedFlags,
@@ -58,6 +62,8 @@ fun AffectionSwipe(vm: ProgressViewModel, onHelp: () -> Unit = {}, onComplete: (
 
     // playerSaidRedFlag: true = player chose "warning", false = "sweet"
     fun onDecision(playerSaidRedFlag: Boolean) {
+        val correct = card.isRedFlag == playerSaidRedFlag
+        sound?.play(if (correct) SoundEffect.MINIGAME_CORRECT else SoundEffect.MINIGAME_WRONG)
         if (card.isRedFlag && playerSaidRedFlag) redFlagsCorrect++
         currentIndex++
     }

@@ -11,11 +11,16 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.ContentRepository
 import com.example.seen.ui.theme.*
 
 @Composable
 fun ResolutionScreen(onDone: () -> Unit) {
+    val sound = LocalSoundManager.current
+    LaunchedEffect(Unit) { sound?.play(SoundEffect.RESOLUTION_CHIME) }
+
     val lines = ContentRepository.resolutionLines
     var lineIndex by remember { mutableIntStateOf(0) }
     val allShown = lineIndex >= lines.size

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.AppId
 import com.example.seen.state.ProgressState
 import com.example.seen.ui.theme.DarkBackground
@@ -50,6 +53,15 @@ fun HomeScreen(
     onAppTap: (AppId) -> Unit,
     onHelp: () -> Unit
 ) {
+    val sound = LocalSoundManager.current
+
+    // Sting when the climax notice first becomes visible
+    LaunchedEffect(progressState.highestCompletedOrder) {
+        if (progressState.highestCompletedOrder >= 4 && !progressState.finished) {
+            sound?.play(SoundEffect.CLIMAX_STING)
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -130,7 +142,10 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     row.forEach { app ->
-                        AppIconCell(app = app, onClick = { onAppTap(app.appId) })
+                        AppIconCell(app = app, onClick = {
+                            sound?.play(SoundEffect.UI_TAP)
+                            onAppTap(app.appId)
+                        })
                     }
                     // Pad incomplete last row
                     repeat(3 - row.size) {

@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.ContentRepository
 import com.example.seen.data.DeviceSignal
 import com.example.seen.data.MiniGame
@@ -31,12 +33,14 @@ fun PhoneCheck(
     onHelp: () -> Unit,
     onComplete: () -> Unit
 ) {
+    val sound = LocalSoundManager.current
     val signals = remember { ContentRepository.deviceSignals.shuffled() }
     val suspiciousSignals = remember { signals.filter { it.isSuspicious } }
     var flagged by remember { mutableStateOf(emptySet<String>()) }
     val allFlagged = remember(flagged) { suspiciousSignals.all { it.label in flagged } }
 
     if (allFlagged && suspiciousSignals.isNotEmpty()) {
+        LaunchedEffect(Unit) { sound?.play(SoundEffect.MINIGAME_COMPLETE) }
         PhoneCheckSuccess(
             onDone = {
                 vm.completeMiniGame(MiniGame.IS_THIS_PHONE_CLEAN)
@@ -93,7 +97,10 @@ fun PhoneCheck(
             SignalRow(
                 signal = signal,
                 isFlagged = signal.label in flagged,
-                onFlag = { flagged = flagged + signal.label }
+                onFlag = {
+                    sound?.play(SoundEffect.UI_TAP)
+                    flagged = flagged + signal.label
+                }
             )
         }
     }

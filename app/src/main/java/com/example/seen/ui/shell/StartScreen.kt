@@ -12,10 +12,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.seen.audio.LocalSoundManager
 import com.example.seen.ui.theme.*
 
 @Composable
 fun StartScreen(onStart: () -> Unit) {
+    val sound = LocalSoundManager.current
+    LaunchedEffect(Unit) { sound?.startBgMusic() }
+
     var showHowToPlay by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
 
@@ -150,6 +154,18 @@ fun StartScreen(onStart: () -> Unit) {
                     )
                     Text(
                         text = "This game is intended solely to raise awareness and build understanding of stalking and its impacts. It does not endorse, glorify, or provide instruction in any harmful behaviour.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = OnDarkBackground
+                    )
+                    HorizontalDivider(color = Divider)
+                    Text(
+                        text = "Credits",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Primary
+                    )
+                    Text(
+                        text = "Developed by Alysha Hannani\nMatrics No. U2101207\nBuilt for WIG3005 Game Development",
                         style = MaterialTheme.typography.bodySmall,
                         color = OnDarkBackground
                     )

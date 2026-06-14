@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.AuditHotspot
 import com.example.seen.data.ContentRepository
 import com.example.seen.data.MiniGame
@@ -31,12 +33,14 @@ fun LockItDown(
     onHelp: () -> Unit,
     onComplete: () -> Unit
 ) {
+    val sound = LocalSoundManager.current
     val hotspots = remember { ContentRepository.lockItDownHotspots.shuffled() }
     val exposingHotspots = remember { hotspots.filter { it.exposing } }
     var tapped by remember { mutableStateOf(emptySet<String>()) }
     val allExposingFound = remember(tapped) { exposingHotspots.all { it.id in tapped } }
 
     if (allExposingFound && exposingHotspots.isNotEmpty()) {
+        LaunchedEffect(Unit) { sound?.play(SoundEffect.MINIGAME_COMPLETE) }
         LockItDownSuccess(
             onDone = {
                 vm.completeMiniGame(MiniGame.LOCK_IT_DOWN)
@@ -113,7 +117,10 @@ fun LockItDown(
             HotspotRow(
                 hotspot = hotspot,
                 isTapped = hotspot.id in tapped,
-                onTap = { tapped = tapped + hotspot.id }
+                onTap = {
+                    sound?.play(SoundEffect.UI_TAP)
+                    tapped = tapped + hotspot.id
+                }
             )
         }
     }

@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.ContentRepository
 import com.example.seen.data.MiniGame
 import com.example.seen.state.ProgressViewModel
@@ -34,6 +36,7 @@ fun TraceItBack(
     onHelp: () -> Unit,
     onComplete: () -> Unit
 ) {
+    val sound = LocalSoundManager.current
     val facts = remember { ContentRepository.traceFacts.shuffled() }
     val allSourceIds = remember { facts.map { it.sourcePostId } }
 
@@ -41,6 +44,7 @@ fun TraceItBack(
     var wrongFeedback by remember { mutableStateOf<String?>(null) }
 
     if (currentIndex >= facts.size) {
+        LaunchedEffect(Unit) { sound?.play(SoundEffect.MINIGAME_COMPLETE) }
         TraceItBackSuccess(
             onDone = {
                 vm.completeMiniGame(MiniGame.TRACE_IT_BACK)
@@ -139,8 +143,10 @@ fun TraceItBack(
                     onClick = {
                         wrongFeedback = null
                         if (sourceId == currentFact.sourcePostId) {
+                            sound?.play(SoundEffect.MINIGAME_CORRECT)
                             currentIndex++
                         } else {
+                            sound?.play(SoundEffect.TENSION_STING)
                             wrongFeedback = "Not quite — look at the other options."
                         }
                     },

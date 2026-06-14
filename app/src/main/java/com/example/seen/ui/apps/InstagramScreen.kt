@@ -28,6 +28,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.ContentRepository
 import com.example.seen.data.GateState
 import com.example.seen.data.IgPost
@@ -41,6 +43,7 @@ fun InstagramScreen(
     onTriggerTap: () -> Unit,
     onSetBackOverride: ((() -> Unit)?) -> Unit
 ) {
+    val sound = LocalSoundManager.current
     var selectedPostId by remember { mutableStateOf<String?>(null) }
 
     // Keep AppScaffold's TopAppBar back arrow in sync with internal state.
@@ -64,7 +67,10 @@ fun InstagramScreen(
             feed = feed,
             gateState = gateState,
             onTriggerTap = onTriggerTap,
-            onPostTap = { selectedPostId = it }
+            onPostTap = { id ->
+                sound?.play(SoundEffect.PHOTO_TAP)
+                selectedPostId = id
+            }
         )
     }
 }
@@ -173,9 +179,17 @@ private fun ProfileHeader(
 
 @Composable
 private fun FullPostView(handle: String, post: IgPost) {
+    val sound = LocalSoundManager.current
     val allImages = remember(post.id) { listOf(post.imageKey) + post.extraImageKeys }
     val isCarousel = allImages.size > 1
     val pagerState = rememberPagerState(pageCount = { allImages.size })
+
+    // Swipe sound on carousel page change (skip the initial mount)
+    var carouselMounted by remember { mutableStateOf(false) }
+    LaunchedEffect(pagerState.currentPage) {
+        if (carouselMounted) sound?.play(SoundEffect.SWIPE_PHOTO)
+        else carouselMounted = true
+    }
 
     LazyColumn(
         modifier = Modifier

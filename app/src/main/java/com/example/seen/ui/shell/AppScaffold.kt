@@ -8,6 +8,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.*
 import com.example.seen.state.ProgressViewModel
 import com.example.seen.ui.apps.*
@@ -27,6 +29,7 @@ fun AppScaffold(
     val state by vm.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val sound = LocalSoundManager.current
     // Screens with internal back-stack (Messages, Instagram) set this to override
     // the TopAppBar arrow without needing to pop the nav graph.
     var overrideBack by remember { mutableStateOf<(() -> Unit)?>(null) }
@@ -38,7 +41,10 @@ fun AppScaffold(
 
     val onTriggerTap: () -> Unit = {
         when (gateState) {
-            GateState.UNLOCKED, GateState.COMPLETED -> hostedMiniGame?.let { onLaunchMiniGame(it) }
+            GateState.UNLOCKED, GateState.COMPLETED -> hostedMiniGame?.let {
+                sound?.play(SoundEffect.MINIGAME_START)
+                onLaunchMiniGame(it)
+            }
             GateState.LOCKED -> scope.launch {
                 snackbarHostState.showSnackbar(
                     message = ContentRepository.lockedNudge,

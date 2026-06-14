@@ -15,6 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
+import com.example.seen.audio.SoundManager
 import com.example.seen.nav.SeenNavHost
 import com.example.seen.state.ProgressViewModel
 import com.example.seen.ui.theme.DarkBackground
@@ -22,14 +25,35 @@ import com.example.seen.ui.theme.OnDarkBackground
 import com.example.seen.ui.theme.SeenTheme
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var soundManager: SoundManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        soundManager = SoundManager(this)
         enableEdgeToEdge()
         setContent {
             SeenTheme {
-                SeenApp()
+                CompositionLocalProvider(LocalSoundManager provides soundManager) {
+                    SeenApp()
+                }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::soundManager.isInitialized) soundManager.resumeBgMusic()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (::soundManager.isInitialized) soundManager.pauseBgMusic()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::soundManager.isInitialized) soundManager.release()
     }
 }
 
@@ -38,6 +62,12 @@ fun SeenApp(vm: ProgressViewModel = viewModel()) {
     val navController = rememberNavController()
     val monologueQueue by vm.monologueQueue.collectAsState()
     val isLoaded by vm.isLoaded.collectAsState()
+    val sound = LocalSoundManager.current
+
+    // Play a notification pop whenever new monologue lines appear
+    LaunchedEffect(monologueQueue.isEmpty()) {
+        if (monologueQueue.isNotEmpty()) sound?.play(SoundEffect.NOTIFICATION_POP)
+    }
 
     Box(
         modifier = Modifier

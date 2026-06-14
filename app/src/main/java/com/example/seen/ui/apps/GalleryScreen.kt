@@ -17,6 +17,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.GalleryItem
 import com.example.seen.ui.theme.*
 
@@ -27,6 +29,7 @@ fun GalleryScreen(
     items: List<GalleryItem>,
     onSetBackOverride: ((() -> Unit)?) -> Unit
 ) {
+    val sound = LocalSoundManager.current
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
 
     if (selectedIndex != null) {
@@ -41,7 +44,10 @@ fun GalleryScreen(
             albumTitle = albumTitle,
             itemCount = itemCount,
             items = items,
-            onItemTap = { selectedIndex = it }
+            onItemTap = { idx ->
+                sound?.play(SoundEffect.PHOTO_TAP)
+                selectedIndex = idx
+            }
         )
     }
 }
@@ -103,7 +109,15 @@ private fun GalleryGrid(
 
 @Composable
 private fun FullImageViewer(items: List<GalleryItem>, startIndex: Int) {
+    val sound = LocalSoundManager.current
     val pagerState = rememberPagerState(initialPage = startIndex, pageCount = { items.size })
+
+    // Swipe sound on page change (skip the initial mount)
+    var viewerMounted by remember { mutableStateOf(false) }
+    LaunchedEffect(pagerState.currentPage) {
+        if (viewerMounted) sound?.play(SoundEffect.SWIPE_PHOTO)
+        else viewerMounted = true
+    }
 
     Box(
         modifier = Modifier

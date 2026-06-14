@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.ContentRepository
 import com.example.seen.data.DecisionOption
 import com.example.seen.data.DecisionNode
@@ -41,14 +43,16 @@ fun WhatDoesSheDo(
     onHelp: () -> Unit,
     onComplete: () -> Unit
 ) {
+    val sound = LocalSoundManager.current
     val introLines = ContentRepository.climaxIntroLines
     val nodes = remember { ContentRepository.decisionNodes.associateBy { it.id } }
 
     var phase by remember { mutableStateOf<WhatPhase>(WhatPhase.Intro(0)) }
 
-    // When Done: mark complete and navigate
+    // When Done: play sting, mark complete and navigate
     if (phase is WhatPhase.Done) {
         LaunchedEffect(Unit) {
+            sound?.play(SoundEffect.CLIMAX_STING)
             vm.completeMiniGame(MiniGame.WHAT_DOES_SHE_DO)
             onComplete()
         }
@@ -92,11 +96,13 @@ fun WhatDoesSheDo(
                         feedback = currentPhase.feedback,
                         onOption = { option ->
                             if (option.safe) {
+                                sound?.play(SoundEffect.MINIGAME_CORRECT)
                                 phase = if (option.nextNodeId != null)
                                     WhatPhase.Decision(option.nextNodeId, null)
                                 else
                                     WhatPhase.Done
                             } else {
+                                sound?.play(SoundEffect.TENSION_STING)
                                 phase = WhatPhase.Decision(currentPhase.nodeId, option.feedback)
                             }
                         },

@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.Conversation
 import com.example.seen.data.GateState
 import com.example.seen.data.Message
@@ -33,6 +35,7 @@ fun MessagesScreen(
     onConversationOpened: (String) -> Unit,
     onSetBackOverride: ((() -> Unit)?) -> Unit
 ) {
+    val sound = LocalSoundManager.current
     var selectedConversation by remember { mutableStateOf<Conversation?>(null) }
 
     // Keep AppScaffold's TopAppBar back arrow in sync with internal state.
@@ -48,6 +51,9 @@ fun MessagesScreen(
         ConversationInbox(
             conversations = conversations,
             onConversationSelected = { conv ->
+                // Aina's thread gets a tension sting; other threads get a regular message open sound
+                if (conv.isAina) sound?.play(SoundEffect.TENSION_STING)
+                else sound?.play(SoundEffect.MESSAGE_OPEN)
                 selectedConversation = conv
                 onConversationOpened(conv.contactId)
             }

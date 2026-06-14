@@ -21,6 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.seen.audio.LocalSoundManager
+import com.example.seen.audio.SoundEffect
 import com.example.seen.data.ContentRepository
 import com.example.seen.ui.theme.DarkBackground
 import com.example.seen.ui.theme.DarkSurface
@@ -37,8 +39,15 @@ fun Lockscreen(
     val preLines = ContentRepository.Lockscreen.preNotificationLines
     val postLines = ContentRepository.Lockscreen.postNotificationLines
 
+    val sound = LocalSoundManager.current
+
     var phase by remember { mutableStateOf(LockPhase.PRE_MONO) }
     var captionIndex by remember { mutableIntStateOf(0) }
+
+    // Pop sound when the notification card slides in
+    LaunchedEffect(phase) {
+        if (phase == LockPhase.NOTIF) sound?.play(SoundEffect.NOTIFICATION_POP)
+    }
 
     fun advance() {
         when (phase) {
@@ -70,7 +79,13 @@ fun Lockscreen(
                 if (phase == LockPhase.INTERACTIVE) {
                     var totalDelta = 0f
                     detectVerticalDragGestures(
-                        onDragEnd = { if (totalDelta < -80f) onSwipeUp(); totalDelta = 0f },
+                        onDragEnd = {
+                            if (totalDelta < -80f) {
+                                sound?.play(SoundEffect.LOCK_SWIPE)
+                                onSwipeUp()
+                            }
+                            totalDelta = 0f
+                        },
                         onDragCancel = { totalDelta = 0f },
                         onVerticalDrag = { _, delta -> totalDelta += delta }
                     )
