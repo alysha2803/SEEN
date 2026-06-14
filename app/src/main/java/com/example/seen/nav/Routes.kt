@@ -1,6 +1,7 @@
 package com.example.seen.nav
 
 object Routes {
+    const val START = "start"
     const val CONTENT_WARNING = "content_warning"
     const val LOCKSCREEN = "lockscreen"
     const val HOME = "home"

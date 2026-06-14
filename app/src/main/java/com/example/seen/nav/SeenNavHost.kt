@@ -17,13 +17,17 @@ fun SeenNavHost(
 ) {
     val state by vm.state.collectAsState()
 
-    val start = when {
-        !state.acceptedContentWarning -> Routes.CONTENT_WARNING
-        state.finished                -> Routes.RESOURCES
-        else                          -> Routes.LOCKSCREEN
-    }
+    NavHost(navController = navController, startDestination = Routes.START) {
 
-    NavHost(navController = navController, startDestination = start) {
+        composable(Routes.START) {
+            StartScreen(
+                onStart = {
+                    navController.navigate(Routes.CONTENT_WARNING) {
+                        popUpTo(Routes.START) { inclusive = true }
+                    }
+                }
+            )
+        }
 
         composable(Routes.CONTENT_WARNING) {
             ContentWarning(
@@ -125,7 +129,7 @@ fun SeenNavHost(
                 showReplay = state.finished,
                 onReplay = {
                     vm.reset()
-                    navController.navigate(Routes.CONTENT_WARNING) {
+                    navController.navigate(Routes.START) {
                         popUpTo(navController.graph.id) { inclusive = true }
                     }
                 }
