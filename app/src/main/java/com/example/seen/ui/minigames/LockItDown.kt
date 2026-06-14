@@ -31,7 +31,7 @@ fun LockItDown(
     onHelp: () -> Unit,
     onComplete: () -> Unit
 ) {
-    val hotspots = ContentRepository.lockItDownHotspots
+    val hotspots = remember { ContentRepository.lockItDownHotspots.shuffled() }
     val exposingHotspots = remember { hotspots.filter { it.exposing } }
     var tapped by remember { mutableStateOf(emptySet<String>()) }
     val allExposingFound = remember(tapped) { exposingHotspots.all { it.id in tapped } }

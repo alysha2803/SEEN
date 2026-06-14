@@ -47,7 +47,8 @@ data class IgPost(
     val username: String,
     val caption: String,
     val location: String? = null,
-    val live: Boolean = false
+    val live: Boolean = false,
+    val extraImageKeys: List<String> = emptyList()
 )
 
 data class GalleryItem(val id: String, val imageKey: String, val label: String)
@@ -281,7 +282,7 @@ object ContentRepository {
         auditPost,
         IgPost("ig_office", "ig_post_office", ainaHandle, "best nasi lemak near my office, come thru on your lunch break", location = "Kuala Lumpur"),
         IgPost("ig_car", "ig_post_car", ainaHandle, "finally got her washed", location = null),
-        IgPost("ig_qr", "ig_post_qr", ainaHandle, "covered the whole table again — DuitNow me back ya (scan below)", location = null),
+        IgPost("ig_qr", "ig_post_qr", ainaHandle, "covered the whole table again — DuitNow me back ya (scan below)", location = null, extraImageKeys = listOf("ig_post_qr_second")),
         IgPost("ig_misc", "ig_post_misc", ainaHandle, "sunday slow mornings", location = null)
     )
 

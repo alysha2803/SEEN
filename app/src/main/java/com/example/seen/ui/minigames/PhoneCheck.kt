@@ -31,7 +31,7 @@ fun PhoneCheck(
     onHelp: () -> Unit,
     onComplete: () -> Unit
 ) {
-    val signals = ContentRepository.deviceSignals
+    val signals = remember { ContentRepository.deviceSignals.shuffled() }
     val suspiciousSignals = remember { signals.filter { it.isSuspicious } }
     var flagged by remember { mutableStateOf(emptySet<String>()) }
     val allFlagged = remember(flagged) { suspiciousSignals.all { it.label in flagged } }

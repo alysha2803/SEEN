@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CallMissed
 import androidx.compose.material3.*
@@ -39,19 +37,12 @@ fun PhoneScreen(
                 modifier = Modifier.padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .background(Primary.copy(alpha = 0.15f), shape = CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "A",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                val ainaConv = conversations.find { it.isAina }
+                ContactAvatar(
+                    avatarKey = ainaConv?.avatarKey ?: "aina_profile",
+                    displayName = contactName,
+                    size = 64.dp
+                )
                 Spacer(Modifier.height(8.dp))
                 Text(contactName, style = MaterialTheme.typography.titleLarge, color = OnDarkBackground, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(4.dp))
@@ -124,7 +115,6 @@ private fun ContactsTab(conversations: List<Conversation>) {
         contentPadding = PaddingValues(vertical = 8.dp)
     ) {
         items(conversations, key = { it.contactId }) { conv ->
-            val initial = conv.displayName.firstOrNull { it.isLetter() }?.uppercaseChar()?.toString() ?: "?"
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -132,19 +122,7 @@ private fun ContactsTab(conversations: List<Conversation>) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Primary.copy(alpha = 0.15f), RoundedCornerShape(50)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        initial,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Primary,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+                ContactAvatar(avatarKey = conv.avatarKey, displayName = conv.displayName, size = 40.dp)
                 Text(
                     conv.displayName,
                     style = MaterialTheme.typography.bodyMedium,

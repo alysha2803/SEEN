@@ -35,7 +35,7 @@ private const val SWIPE_THRESHOLD = 180f
 
 @Composable
 fun AffectionSwipe(vm: ProgressViewModel, onHelp: () -> Unit = {}, onComplete: () -> Unit) {
-    val deck = remember { ContentRepository.affectionDeck }
+    val deck = remember { ContentRepository.affectionDeck.shuffled() }
     var currentIndex by remember { mutableIntStateOf(0) }
     var redFlagsCorrect by remember { mutableIntStateOf(0) }
 

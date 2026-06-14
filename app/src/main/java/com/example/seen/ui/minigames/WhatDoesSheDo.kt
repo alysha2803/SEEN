@@ -261,8 +261,9 @@ private fun DecisionPhase(
             }
         }
 
-        // Options
-        node.options.forEach { option ->
+        // Options — shuffled per node so order is unpredictable each session
+        val shuffledOptions = remember(node.id) { node.options.shuffled() }
+        shuffledOptions.forEach { option ->
             Button(
                 onClick = { onOption(option) },
                 modifier = Modifier.fillMaxWidth(),

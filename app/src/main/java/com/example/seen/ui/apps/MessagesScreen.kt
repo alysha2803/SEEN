@@ -89,7 +89,6 @@ private fun ConversationInbox(
 @Composable
 private fun ConversationRow(conv: Conversation, onClick: () -> Unit) {
     val lastMsg = conv.messages.lastOrNull()
-    val initial = conv.displayName.firstOrNull { it.isLetter() }?.uppercaseChar()?.toString() ?: "?"
 
     Row(
         modifier = Modifier
@@ -99,14 +98,7 @@ private fun ConversationRow(conv: Conversation, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .background(Primary.copy(alpha = 0.15f), RoundedCornerShape(50)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(initial, style = MaterialTheme.typography.bodyLarge, color = Primary, fontWeight = FontWeight.Bold)
-        }
+        ContactAvatar(avatarKey = conv.avatarKey, displayName = conv.displayName, size = 48.dp)
 
         Column(modifier = Modifier.weight(1f)) {
             Row(
@@ -167,16 +159,7 @@ private fun ConversationThread(
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val initial = conversation.displayName.firstOrNull { it.isLetter() }
-                    ?.uppercaseChar()?.toString() ?: "?"
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .background(Primary.copy(alpha = 0.2f), RoundedCornerShape(50)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(initial, fontWeight = FontWeight.Bold, color = Primary)
-                }
+                ContactAvatar(avatarKey = conversation.avatarKey, displayName = conversation.displayName, size = 38.dp)
                 Spacer(Modifier.width(10.dp))
                 Column {
                     Text(

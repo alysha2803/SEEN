@@ -34,7 +34,7 @@ fun TraceItBack(
     onHelp: () -> Unit,
     onComplete: () -> Unit
 ) {
-    val facts = remember { ContentRepository.traceFacts }
+    val facts = remember { ContentRepository.traceFacts.shuffled() }
     val allSourceIds = remember { facts.map { it.sourcePostId } }
 
     var currentIndex by remember { mutableIntStateOf(0) }

@@ -9,13 +9,20 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +44,7 @@ fun InstagramScreen(
     var selectedPostId by remember { mutableStateOf<String?>(null) }
 
     // Keep AppScaffold's TopAppBar back arrow in sync with internal state.
+    // DisposableEffect self-clears when the post is dismissed.
     if (selectedPostId != null) {
         DisposableEffect(Unit) {
             onSetBackOverride { selectedPostId = null }
@@ -119,19 +127,11 @@ private fun ProfileHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .background(Primary.copy(alpha = 0.2f), RoundedCornerShape(50)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "A",
-                        fontWeight = FontWeight.Bold,
-                        color = Primary,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
+                ContactAvatar(
+                    avatarKey = "aina_profile",
+                    displayName = "Aina",
+                    size = 56.dp
+                )
                 Column {
                     Text(
                         "@$handle",
@@ -173,6 +173,10 @@ private fun ProfileHeader(
 
 @Composable
 private fun FullPostView(handle: String, post: IgPost) {
+    val allImages = remember(post.id) { listOf(post.imageKey) + post.extraImageKeys }
+    val isCarousel = allImages.size > 1
+    val pagerState = rememberPagerState(pageCount = { allImages.size })
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -180,7 +184,7 @@ private fun FullPostView(handle: String, post: IgPost) {
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
         item {
-            // Post header
+            // Post header row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -188,14 +192,7 @@ private fun FullPostView(handle: String, post: IgPost) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .background(Primary.copy(alpha = 0.15f), RoundedCornerShape(50)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("A", style = MaterialTheme.typography.labelSmall, color = Primary)
-                }
+                ContactAvatar(avatarKey = "aina_profile", displayName = "Aina", size = 28.dp)
                 Text(
                     "@$handle",
                     style = MaterialTheme.typography.bodySmall,
@@ -228,14 +225,92 @@ private fun FullPostView(handle: String, post: IgPost) {
         }
 
         item {
-            AsyncImage(
-                model = "file:///android_asset/images/${post.imageKey}.png",
-                contentDescription = "Post by @$handle",
-                contentScale = ContentScale.FillWidth,
+            if (isCarousel) {
+                Column {
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.fillMaxWidth()
+                    ) { page ->
+                        AsyncImage(
+                            model = "file:///android_asset/images/${allImages[page]}.png",
+                            contentDescription = "Post by @$handle (${page + 1} of ${allImages.size})",
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                        )
+                    }
+                    // Page indicator dots
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        allImages.indices.forEach { index ->
+                            val isActive = index == pagerState.currentPage
+                            Box(
+                                modifier = Modifier
+                                    .padding(horizontal = 3.dp)
+                                    .size(if (isActive) 8.dp else 6.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isActive) Primary else Divider)
+                            )
+                        }
+                    }
+                }
+            } else {
+                AsyncImage(
+                    model = "file:///android_asset/images/${post.imageKey}.png",
+                    contentDescription = "Post by @$handle",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                )
+            }
+        }
+
+        item {
+            // Like / comment / share row (non-interactive)
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1f)
-            )
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    Icons.Default.Favorite,
+                    contentDescription = null,
+                    tint = OnDarkBackground.copy(alpha = 0.55f),
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    "2.1K",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextMuted
+                )
+                Icon(
+                    Icons.Default.Send,
+                    contentDescription = null,
+                    tint = OnDarkBackground.copy(alpha = 0.55f),
+                    modifier = Modifier.size(22.dp)
+                )
+                Text(
+                    "48",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextMuted
+                )
+                Spacer(Modifier.weight(1f))
+                Icon(
+                    Icons.Default.Share,
+                    contentDescription = null,
+                    tint = OnDarkBackground.copy(alpha = 0.55f),
+                    modifier = Modifier.size(22.dp)
+                )
+            }
         }
 
         item {

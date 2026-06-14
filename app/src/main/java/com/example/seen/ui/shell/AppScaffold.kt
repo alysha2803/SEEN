@@ -103,7 +103,8 @@ fun AppScaffold(
                 AppId.GALLERY -> GalleryScreen(
                     albumTitle = ContentRepository.galleryAlbumTitle,
                     itemCount = ContentRepository.galleryItemCount,
-                    items = ContentRepository.gallery
+                    items = ContentRepository.gallery,
+                    onSetBackOverride = { overrideBack = it }
                 )
                 AppId.NOTES -> NotesScreen(
                     notes = ContentRepository.notes,

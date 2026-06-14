@@ -1,13 +1,18 @@
 package com.example.seen.ui.apps
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -19,10 +24,36 @@ import com.example.seen.ui.theme.*
 fun GalleryScreen(
     albumTitle: String,
     itemCount: Int,
-    items: List<GalleryItem>
+    items: List<GalleryItem>,
+    onSetBackOverride: ((() -> Unit)?) -> Unit
+) {
+    var selectedIndex by remember { mutableStateOf<Int?>(null) }
+
+    if (selectedIndex != null) {
+        DisposableEffect(Unit) {
+            onSetBackOverride { selectedIndex = null }
+            onDispose { onSetBackOverride(null) }
+        }
+        BackHandler { selectedIndex = null }
+        FullImageViewer(items = items, startIndex = selectedIndex!!)
+    } else {
+        GalleryGrid(
+            albumTitle = albumTitle,
+            itemCount = itemCount,
+            items = items,
+            onItemTap = { selectedIndex = it }
+        )
+    }
+}
+
+@Composable
+private fun GalleryGrid(
+    albumTitle: String,
+    itemCount: Int,
+    items: List<GalleryItem>,
+    onItemTap: (Int) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize().background(DarkBackground)) {
-        // Album header
         Surface(color = DarkSurface, modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(albumTitle, style = MaterialTheme.typography.titleLarge, color = Primary, fontWeight = FontWeight.SemiBold)
@@ -37,8 +68,12 @@ fun GalleryScreen(
             verticalArrangement = Arrangement.spacedBy(2.dp),
             contentPadding = PaddingValues(2.dp)
         ) {
-            items(items, key = { it.id }) { item ->
-                Box(modifier = Modifier.aspectRatio(1f)) {
+            itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
+                Box(
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .clickable { onItemTap(index) }
+                ) {
                     AsyncImage(
                         model = "file:///android_asset/images/${item.imageKey}.png",
                         contentDescription = item.label,
@@ -62,6 +97,44 @@ fun GalleryScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FullImageViewer(items: List<GalleryItem>, startIndex: Int) {
+    val pagerState = rememberPagerState(initialPage = startIndex, pageCount = { items.size })
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            AsyncImage(
+                model = "file:///android_asset/images/${items[page].imageKey}.png",
+                contentDescription = items[page].label,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        // Page counter badge
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(12.dp)
+                .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
+                .padding(horizontal = 8.dp, vertical = 3.dp)
+        ) {
+            Text(
+                text = "${pagerState.currentPage + 1} / ${items.size}",
+                style = MaterialTheme.typography.labelMedium,
+                color = Color.White.copy(alpha = 0.85f)
+            )
         }
     }
 }

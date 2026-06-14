@@ -27,7 +27,8 @@ Loaded by Coil via `"file:///android_asset/images/<imageKey>.png"`.
 | `ig_post_audit` | Instagram feed (first / pinned post); MG2 "Lock it down" target | 1080 × 1080 | Saturday reset post. Should include subtle visual references to: live-location sticker, gym tag, car in background, QR code corner, restaurant caption. All fictional. |
 | `ig_post_office` | Instagram feed | 1080 × 1080 | Nasi lemak lunch. Fictional restaurant — no identifiable real landmark. |
 | `ig_post_car` | Instagram feed | 1080 × 1080 | Washed car. Fictional number plate (WXX 1234 or clearly fake). |
-| `ig_post_qr` | Instagram feed | 1080 × 1080 | Table of food + DuitNow QR. QR must be fictional (not a real payable code). |
+| `ig_post_qr` | Instagram feed — carousel page 1 | 1080 × 1080 | Table of food + DuitNow QR. QR must be fictional (not a real payable code). |
+| `ig_post_qr_second` | Instagram feed — carousel page 2 (same post as `ig_post_qr`) | 1080 × 1080 | Second photo in the "covered the whole table again" post. E.g. close-up of dishes or receipt. |
 | `ig_post_misc` | Instagram feed | 1080 × 1080 | Slow Sunday morning. Generic ambient image. |
 
 ## Gallery
