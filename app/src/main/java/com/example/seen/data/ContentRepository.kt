@@ -33,6 +33,14 @@ data class Message(
     val afterBlock: Boolean = false
 )
 
+data class Conversation(
+    val contactId: String,
+    val displayName: String,
+    val avatarKey: String,
+    val isAina: Boolean = false,
+    val messages: List<Message>
+)
+
 data class IgPost(
     val id: String,
     val imageKey: String,
@@ -72,6 +80,7 @@ sealed interface Trigger {
     data class OnFirstOpen(val app: AppId) : Trigger
     data class OnMiniGameComplete(val mg: MiniGame) : Trigger
     data class OnLockedMiniGameTap(val mg: MiniGame) : Trigger
+    data class OnOpenConversation(val contactId: String) : Trigger
 }
 
 data class MonologueBeat(val id: String, val trigger: Trigger, val lines: List<String>)
@@ -99,18 +108,136 @@ object ContentRepository {
     }
 
     // ---------- Messages (Scene 1, hosts MG1) ----------
-    val messages: List<Message> = listOf(
-        Message("m01", fromOwner = true, text = "good morning beautiful", timestamp = "Mon 08:02", receipt = Receipt.READ),
-        Message("m02", fromOwner = true, text = "you wore the green dress today, it suits you", timestamp = "Mon 18:40", receipt = Receipt.READ),
-        Message("m03", fromOwner = false, text = "who is this?", timestamp = "Mon 18:55"),
-        Message("m04", fromOwner = false, text = "please stop messaging me", timestamp = "Mon 19:01"),
-        Message("m05", fromOwner = false, text = "stop or I'm blocking you", timestamp = "Mon 19:02"),
-        Message("m06", fromOwner = true, text = "why did you block me", timestamp = "Tue 21:10", receipt = Receipt.DELIVERED, afterBlock = true),
-        Message("m07", fromOwner = true, text = "why are you ignoring me", timestamp = "Wed 23:30", receipt = Receipt.DELIVERED, afterBlock = true),
-        Message("m08", fromOwner = true, text = "I saw you today", timestamp = "Thu 13:12", receipt = Receipt.DELIVERED, afterBlock = true),
-        Message("m09", fromOwner = true, text = "who was that guy walking you to your car", timestamp = "Fri 19:48", receipt = Receipt.DELIVERED, afterBlock = true),
-        Message("m10", fromOwner = true, text = "you can't ignore me forever", timestamp = "Fri 23:20", receipt = Receipt.DELIVERED, afterBlock = true),
-        Message("m11", fromOwner = true, text = "saw you got home safe. you looked tired tonight. sleep well, beautiful x", timestamp = "Sat 01:58", receipt = Receipt.DELIVERED, afterBlock = true)
+    val conversations: List<Conversation> = listOf(
+
+        Conversation(
+            contactId = "conv_aina",
+            displayName = "My Love ♥",
+            avatarKey = "aina_profile",
+            isAina = true,
+            messages = listOf(
+                // --- pre-block: escalating contact, her replies cooling ---
+                Message("m_a00", fromOwner = true,  text = "hey", timestamp = "Sat 14:31", receipt = Receipt.READ),
+                Message("m_a01", fromOwner = true,  text = "I keep seeing you around. wanted to say hi", timestamp = "Sat 14:32", receipt = Receipt.READ),
+                Message("m_a02", fromOwner = true,  text = "good morning :)", timestamp = "Sun 09:07", receipt = Receipt.READ),
+                Message("m_a03", fromOwner = true,  text = "how was your day", timestamp = "Sun 20:14", receipt = Receipt.READ),
+                Message("m01",   fromOwner = true,  text = "good morning beautiful", timestamp = "Mon 08:02", receipt = Receipt.READ),
+                Message("m_a04", fromOwner = true,  text = "you must be at lunch. I love that place you go to", timestamp = "Mon 12:15", receipt = Receipt.READ),
+                Message("m_a05", fromOwner = true,  text = "I haven't heard from you. did I do something wrong", timestamp = "Mon 15:00", receipt = Receipt.READ),
+                Message("m02",   fromOwner = true,  text = "you wore the green dress today, it suits you", timestamp = "Mon 18:40", receipt = Receipt.READ),
+                Message("m03",   fromOwner = false, text = "who is this?", timestamp = "Mon 18:55"),
+                Message("m_a06", fromOwner = true,  text = "it's me. I see you every day. I thought you knew I liked you", timestamp = "Mon 18:56", receipt = Receipt.READ),
+                Message("m_a07", fromOwner = false, text = "please don't message me again", timestamp = "Mon 18:57"),
+                Message("m_a08", fromOwner = true,  text = "I'm sorry. can we just start over? I really like you", timestamp = "Mon 18:58", receipt = Receipt.READ),
+                Message("m04",   fromOwner = false, text = "please stop messaging me", timestamp = "Mon 19:01"),
+                Message("m_a09", fromOwner = true,  text = "I really like you. why won't you give me a chance", timestamp = "Mon 19:01", receipt = Receipt.READ),
+                Message("m05",   fromOwner = false, text = "stop or I'm blocking you", timestamp = "Mon 19:02"),
+                // --- post-block ---
+                Message("m06", fromOwner = true, text = "why did you block me", timestamp = "Tue 21:10", receipt = Receipt.DELIVERED, afterBlock = true),
+                Message("m07", fromOwner = true, text = "why are you ignoring me", timestamp = "Wed 23:30", receipt = Receipt.DELIVERED, afterBlock = true),
+                Message("m08", fromOwner = true, text = "I saw you today", timestamp = "Thu 13:12", receipt = Receipt.DELIVERED, afterBlock = true),
+                Message("m09", fromOwner = true, text = "who was that guy walking you to your car", timestamp = "Fri 19:48", receipt = Receipt.DELIVERED, afterBlock = true),
+                Message("m10", fromOwner = true, text = "you can't ignore me forever", timestamp = "Fri 23:20", receipt = Receipt.DELIVERED, afterBlock = true),
+                Message("m11", fromOwner = true, text = "saw you got home safe. you looked tired tonight. sleep well, beautiful x", timestamp = "Sat 01:58", receipt = Receipt.DELIVERED, afterBlock = true)
+            )
+        ),
+
+        Conversation(
+            contactId = "conv_chong",
+            displayName = "Chong",
+            avatarKey = "chong_avatar",
+            messages = listOf(
+                Message("cg01", fromOwner = false, text = "bro are you playing futsal Saturday", timestamp = "Thu 14:22"),
+                Message("cg02", fromOwner = true,  text = "maybe la", timestamp = "Thu 14:35"),
+                Message("cg03", fromOwner = false, text = "okay. mamak tonight?", timestamp = "Thu 14:36"),
+                Message("cg04", fromOwner = true,  text = "yeah", timestamp = "Thu 14:40"),
+                Message("cg05", fromOwner = false, text = "you seem distracted lately haha, new girl?", timestamp = "Thu 18:02"),
+                Message("cg06", fromOwner = true,  text = "sort of. there's this girl near my place. her name's Aina", timestamp = "Thu 18:15"),
+                Message("cg07", fromOwner = false, text = "do you know her", timestamp = "Thu 18:16"),
+                Message("cg08", fromOwner = true,  text = "not yet. but I follow her IG. she posts everything", timestamp = "Thu 18:18"),
+                Message("cg09", fromOwner = false, text = "lol stalker", timestamp = "Thu 18:19"),
+                Message("cg10", fromOwner = true,  text = "it's not stalking, it's a public account", timestamp = "Thu 18:20"),
+                Message("cg11", fromOwner = true,  text = "I already texted her actually", timestamp = "Thu 18:20"),
+                Message("cg12", fromOwner = false, text = "did she reply", timestamp = "Thu 18:22"),
+                Message("cg13", fromOwner = true,  text = "she read it but didn't reply. she'll come around", timestamp = "Thu 18:24"),
+                Message("cg14", fromOwner = false, text = "maybe she's just not interested bro", timestamp = "Thu 18:25"),
+                Message("cg15", fromOwner = true,  text = "no. I know her schedule — pilates Tues and Thurs, her lunch spot, even her office block", timestamp = "Thu 18:28"),
+                Message("cg16", fromOwner = false, text = "bro that's a lot", timestamp = "Thu 18:30"),
+                Message("cg17", fromOwner = true,  text = "it's all stuff she posted publicly", timestamp = "Thu 18:31"),
+                Message("cg18", fromOwner = false, text = "okay... just don't do anything you'd regret", timestamp = "Thu 18:33"),
+                Message("cg19", fromOwner = true,  text = "relax. I just really like her", timestamp = "Thu 18:35")
+            )
+        ),
+
+        Conversation(
+            contactId = "conv_mom",
+            displayName = "Mom",
+            avatarKey = "mom_avatar",
+            messages = listOf(
+                Message("mm01", fromOwner = false, text = "have you eaten", timestamp = "Tue 12:30"),
+                Message("mm02", fromOwner = true,  text = "not yet", timestamp = "Tue 12:45"),
+                Message("mm03", fromOwner = false, text = "don't skip lunch. I made chicken tonight, are you coming home", timestamp = "Tue 12:46"),
+                Message("mm04", fromOwner = true,  text = "maybe, I'll see", timestamp = "Tue 12:50"),
+                Message("mm05", fromOwner = false, text = "stop eating out so much, it's not good for you", timestamp = "Tue 12:51"),
+                Message("mm06", fromOwner = true,  text = "okay mum", timestamp = "Tue 12:52"),
+                Message("mm07", fromOwner = false, text = "buy milk on the way back if you come. Dutch Lady full cream", timestamp = "Tue 16:00"),
+                Message("mm08", fromOwner = true,  text = "okay", timestamp = "Tue 16:10"),
+                Message("mm09", fromOwner = false, text = "how's work? is your boss okay", timestamp = "Tue 20:00"),
+                Message("mm10", fromOwner = true,  text = "same as always", timestamp = "Tue 20:15"),
+                Message("mm11", fromOwner = false, text = "remember to pray", timestamp = "Tue 20:16"),
+                Message("mm12", fromOwner = true,  text = "okay mum", timestamp = "Tue 20:16"),
+                Message("mm13", fromOwner = false, text = "come home this weekend. your sister keeps asking about you", timestamp = "Tue 21:00"),
+                Message("mm14", fromOwner = true,  text = "I'll see", timestamp = "Tue 21:05")
+            )
+        ),
+
+        Conversation(
+            contactId = "conv_grab",
+            displayName = "GrabFood",
+            avatarKey = "generic_contact_avatar",
+            messages = listOf(
+                Message("gf01", fromOwner = false, text = "Your order has been confirmed. Mamak Corner — Nasi Lemak Set", timestamp = "Mon 12:01"),
+                Message("gf02", fromOwner = false, text = "Your rider is on the way", timestamp = "Mon 12:15"),
+                Message("gf03", fromOwner = false, text = "Your rider has arrived!", timestamp = "Mon 12:28"),
+                Message("gf04", fromOwner = false, text = "Enjoyed your order? Leave a rating to help your rider", timestamp = "Mon 12:45")
+            )
+        ),
+
+        Conversation(
+            contactId = "conv_bank",
+            displayName = "Maybank",
+            avatarKey = "generic_contact_avatar",
+            messages = listOf(
+                Message("bk01", fromOwner = false, text = "Your OTP is 834521. Valid for 5 mins. Do not share with anyone.", timestamp = "Mon 09:02"),
+                Message("bk02", fromOwner = false, text = "Maybank2U: RM85.00 spent at SHOPEE on 10 Jun. Balance: RM1,204.38", timestamp = "Wed 10:32"),
+                Message("bk03", fromOwner = false, text = "Your OTP is 291047. Valid for 5 mins. Do not share with anyone.", timestamp = "Thu 14:55")
+            )
+        ),
+
+        Conversation(
+            contactId = "conv_ahmad",
+            displayName = "Ahmad (work)",
+            avatarKey = "generic_contact_avatar",
+            messages = listOf(
+                Message("ah01", fromOwner = false, text = "bro did you send the slides yet", timestamp = "Mon 09:30"),
+                Message("ah02", fromOwner = true,  text = "not yet, 5 mins", timestamp = "Mon 09:40"),
+                Message("ah03", fromOwner = false, text = "boss was asking just now", timestamp = "Mon 09:41"),
+                Message("ah04", fromOwner = true,  text = "sent", timestamp = "Mon 09:45"),
+                Message("ah05", fromOwner = false, text = "okay thanks", timestamp = "Mon 09:46")
+            )
+        ),
+
+        Conversation(
+            contactId = "conv_housemates",
+            displayName = "Housemates 🏠",
+            avatarKey = "generic_contact_avatar",
+            messages = listOf(
+                Message("hs01", fromOwner = false, text = "guys the water bill this month", timestamp = "Fri 20:00"),
+                Message("hs02", fromOwner = false, text = "RM120 each", timestamp = "Fri 20:01"),
+                Message("hs03", fromOwner = true,  text = "okay I'll transfer later", timestamp = "Fri 20:05"),
+                Message("hs04", fromOwner = false, text = "same, transferring now", timestamp = "Fri 20:06")
+            )
+        )
     )
 
     // ---------- Phone (Scene 2) ----------
@@ -159,6 +286,12 @@ object ContentRepository {
     )
 
     // ---------- X / Twitter (Scene 5) ----------
+    const val xDisplayName = "Aina"
+    const val xBio = "kl girl. coffee & pilates. opinions are my own."
+    const val xLocation = "Kuala Lumpur"
+    const val xFollowing = "348"
+    const val xFollowers = "1.2K"
+
     val tweets: List<Tweet> = listOf(
         Tweet("tw_housemate", "@$ainaHandle", "looking for a housemate! room near the LRT — msg or call 01X-XXX XXXX, place is [Condo Name], Cheras"),
         Tweet("tw1", "@$ainaHandle", "kl traffic today is criminal"),
@@ -297,10 +430,17 @@ object ContentRepository {
     const val closingLine = "She did everything right. She still didn't see him. That's the part that should scare us — and the part we can change."
 
     val beats: List<MonologueBeat> = listOf(
-        MonologueBeat("open_messages", Trigger.OnFirstOpen(AppId.MESSAGES), listOf(
+        // Re-keyed: fires when Aina's conversation is opened, not on app first-open
+        MonologueBeat("open_messages", Trigger.OnOpenConversation("conv_aina"), listOf(
             "That's... sweet. He was just making sure she got back okay.",
             "She doesn't write back much. Busy, maybe.",
             "...Something feels off about this."
+        )),
+        MonologueBeat("obs_chong", Trigger.OnOpenConversation("conv_chong"), listOf(
+            "He's obsessed — and he's telling his friends about her."
+        )),
+        MonologueBeat("any_mom", Trigger.OnOpenConversation("conv_mom"), listOf(
+            "Anyone can be a stalker. Even someone whose mum still texts about dinner."
         )),
         MonologueBeat("after_mg1", Trigger.OnMiniGameComplete(MiniGame.AFFECTION_OR_RED_FLAG), listOf(
             "She's not quiet because she's busy. She told him to stop. She blocked him.",

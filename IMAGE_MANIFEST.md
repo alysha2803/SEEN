@@ -56,6 +56,14 @@ Loaded by Coil via `"file:///android_asset/images/<imageKey>.png"`.
 |---|---|---|---|
 | `map_static` | MapsScreen background | 1080 × 1080 | Generic city map tile (fictional or freely-licensed). Pins are rendered as Compose overlays at xPct/yPct positions — no map SDK required. |
 
+## Contacts / Messages avatars
+
+| imageKey | Appears in | Suggested size | Notes |
+|---|---|---|---|
+| `chong_avatar` | Messages inbox — Chong conversation row | 400 × 400 | Fictional adult male. Currently falls back to text initial "C". Replace with real art to activate. |
+| `mom_avatar` | Messages inbox — Mom conversation row | 400 × 400 | Fictional adult woman (older). Currently falls back to text initial "M". Replace with real art to activate. |
+| `generic_contact_avatar` | Messages inbox — GrabFood, Maybank, Ahmad, Housemates rows; Phone Contacts tab | 400 × 400 | Generic placeholder for contacts without personalised art. Text initial fallback is used until this is replaced. |
+
 ## Monitor (grey app)
 
 | imageKey | Appears in | Suggested size | Notes |

@@ -27,6 +27,9 @@ fun AppScaffold(
     val state by vm.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    // Screens with internal back-stack (Messages, Instagram) set this to override
+    // the TopAppBar arrow without needing to pop the nav graph.
+    var overrideBack by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     val hostedMiniGame = remember(appId) { MiniGame.entries.find { it.hostApp == appId } }
     val gateState = hostedMiniGame?.gateState(state.highestCompletedOrder)
@@ -54,7 +57,7 @@ fun AppScaffold(
                     Text(appId.displayName(), color = OnDarkBackground)
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = { overrideBack?.invoke() ?: onBack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
@@ -85,14 +88,17 @@ fun AppScaffold(
         ) {
             when (appId) {
                 AppId.MESSAGES -> MessagesScreen(
-                    messages = ContentRepository.messages,
+                    conversations = ContentRepository.conversations,
                     gateState = gateState ?: GateState.LOCKED,
-                    onTriggerTap = onTriggerTap
+                    onTriggerTap = onTriggerTap,
+                    onConversationOpened = { contactId -> vm.markConversationOpened(contactId) },
+                    onSetBackOverride = { overrideBack = it }
                 )
                 AppId.PHONE -> PhoneScreen(
                     contactName = ContentRepository.callContactName,
                     summary = ContentRepository.callLogSummary,
-                    callLog = ContentRepository.callLog
+                    callLog = ContentRepository.callLog,
+                    conversations = ContentRepository.conversations
                 )
                 AppId.GALLERY -> GalleryScreen(
                     albumTitle = ContentRepository.galleryAlbumTitle,
@@ -108,9 +114,18 @@ fun AppScaffold(
                     handle = ContentRepository.ainaHandle,
                     feed = ContentRepository.instagramFeed,
                     gateState = gateState ?: GateState.LOCKED,
-                    onTriggerTap = onTriggerTap
+                    onTriggerTap = onTriggerTap,
+                    onSetBackOverride = { overrideBack = it }
                 )
-                AppId.X -> XScreen(tweets = ContentRepository.tweets)
+                AppId.X -> XScreen(
+                    handle = ContentRepository.ainaHandle,
+                    displayName = ContentRepository.xDisplayName,
+                    bio = ContentRepository.xBio,
+                    location = ContentRepository.xLocation,
+                    following = ContentRepository.xFollowing,
+                    followers = ContentRepository.xFollowers,
+                    tweets = ContentRepository.tweets
+                )
                 AppId.BROWSER -> BrowserScreen(searches = ContentRepository.searches)
                 AppId.MAPS -> MapsScreen(
                     staticImageKey = ContentRepository.mapStaticKey,

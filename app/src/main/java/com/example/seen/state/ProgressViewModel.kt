@@ -52,6 +52,10 @@ class ProgressViewModel(application: Application) : AndroidViewModel(application
         enqueueBeat(Trigger.OnMiniGameComplete(mg))
     }
 
+    fun markConversationOpened(contactId: String) {
+        enqueueBeat(Trigger.OnOpenConversation(contactId))
+    }
+
     fun finish() = update { it.copy(finished = true) }
 
     fun reset() {
