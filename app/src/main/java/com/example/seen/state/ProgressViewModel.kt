@@ -17,11 +17,19 @@ class ProgressViewModel(application: Application) : AndroidViewModel(application
     private val _monologueQueue = MutableStateFlow<List<String>>(emptyList())
     val monologueQueue: StateFlow<List<String>> = _monologueQueue.asStateFlow()
 
+    private val _isLoaded = MutableStateFlow(false)
+    val isLoaded: StateFlow<Boolean> = _isLoaded.asStateFlow()
+
     init {
-        // collect() on DataStore always emits the current persisted value first,
-        // then subsequent updates — no need for a separate first() call.
         viewModelScope.launch {
-            store.progressFlow.collect { saved -> _state.value = saved }
+            var firstEmit = true
+            store.progressFlow.collect { saved ->
+                _state.value = saved
+                if (firstEmit) {
+                    _isLoaded.value = true
+                    firstEmit = false
+                }
+            }
         }
     }
 

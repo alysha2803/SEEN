@@ -20,7 +20,11 @@ import com.example.seen.ui.theme.TextMuted
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ResourcesScreen(onBack: () -> Unit) {
+fun ResourcesScreen(
+    onBack: () -> Unit,
+    showReplay: Boolean = false,
+    onReplay: () -> Unit = {}
+) {
     Scaffold(
         containerColor = DarkBackground,
         topBar = {
@@ -77,9 +81,26 @@ fun ResourcesScreen(onBack: () -> Unit) {
                 Text(
                     text = "Verify all contact details are current before relying on them.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextMuted,
-                    modifier = Modifier.padding(bottom = 32.dp)
+                    color = TextMuted
                 )
+            }
+
+            if (showReplay) {
+                item {
+                    Spacer(Modifier.height(24.dp))
+                    HorizontalDivider(color = Divider)
+                    Spacer(Modifier.height(16.dp))
+                    OutlinedButton(
+                        onClick = onReplay,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 32.dp)
+                    ) {
+                        Text("Play again from the start", color = OnDarkBackground)
+                    }
+                }
+            } else {
+                item { Spacer(Modifier.height(32.dp)) }
             }
         }
     }

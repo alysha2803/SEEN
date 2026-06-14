@@ -5,6 +5,7 @@ object Routes {
     const val LOCKSCREEN = "lockscreen"
     const val HOME = "home"
     const val RESOURCES = "resources"
+    const val RESOLUTION = "resolution"
 
     const val APP_ROUTE = "app/{appId}"
     const val MINIGAME_ROUTE = "minigame/{minigameId}"

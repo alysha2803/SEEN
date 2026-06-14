@@ -37,12 +37,17 @@ class MainActivity : ComponentActivity() {
 fun SeenApp(vm: ProgressViewModel = viewModel()) {
     val navController = rememberNavController()
     val monologueQueue by vm.monologueQueue.collectAsState()
+    val isLoaded by vm.isLoaded.collectAsState()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkBackground)
     ) {
+        // Hold on a black screen until DataStore emits so startDestination is computed
+        // from the real persisted state, not the ProgressState() default.
+        if (!isLoaded) return@Box
+
         SeenNavHost(navController = navController, vm = vm)
 
         // Monologue overlay sits on top of every screen

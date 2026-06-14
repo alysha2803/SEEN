@@ -1,5 +1,6 @@
 package com.example.seen.ui.shell
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -74,6 +75,41 @@ fun HomeScreen(
             Text("2:14", fontSize = 14.sp, color = OnDarkBackground)
             IconButton(onClick = onHelp, modifier = Modifier.size(36.dp)) {
                 Icon(Icons.Default.Help, contentDescription = "Leave / get help", tint = OnDarkBackground.copy(alpha = 0.7f))
+            }
+        }
+
+        // After MG4, show an urgent notification that beckons the player to the climax
+        val showClimaxNotice = progressState.highestCompletedOrder >= 4 && !progressState.finished
+        if (showClimaxNotice) {
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(top = 44.dp, start = 16.dp, end = 16.dp)
+                    .clickable { onAppTap(AppId.CLIMAX) },
+                shape = RoundedCornerShape(12.dp),
+                color = Color.Black.copy(alpha = 0.9f),
+                border = BorderStroke(1.dp, Color(0xFFCF6679).copy(alpha = 0.7f))
+            ) {
+                Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        "Maps",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = OnDarkBackground.copy(alpha = 0.5f)
+                    )
+                    Text(
+                        "\"A ♥\" has arrived Home — 1.2 km away",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFFCF6679),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        "Tap to respond →",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = OnDarkBackground.copy(alpha = 0.4f)
+                    )
+                }
             }
         }
 

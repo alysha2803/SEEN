@@ -20,6 +20,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Help
 import com.example.seen.data.BehaviorCard
 import com.example.seen.data.ContentRepository
 import com.example.seen.data.MiniGame
@@ -32,7 +34,7 @@ import kotlin.math.roundToInt
 private const val SWIPE_THRESHOLD = 180f
 
 @Composable
-fun AffectionSwipe(vm: ProgressViewModel, onComplete: () -> Unit) {
+fun AffectionSwipe(vm: ProgressViewModel, onHelp: () -> Unit = {}, onComplete: () -> Unit) {
     val deck = remember { ContentRepository.affectionDeck }
     var currentIndex by remember { mutableIntStateOf(0) }
     var redFlagsCorrect by remember { mutableIntStateOf(0) }
@@ -73,19 +75,30 @@ fun AffectionSwipe(vm: ProgressViewModel, onComplete: () -> Unit) {
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = "Affection or red flag?",
-                style = MaterialTheme.typography.titleLarge,
-                color = OnDarkBackground,
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = "${currentIndex + 1} / ${deck.size}",
-                style = MaterialTheme.typography.bodySmall,
-                color = TextMuted
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "Affection or red flag?",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = OnDarkBackground,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = "${currentIndex + 1} / ${deck.size}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextMuted
+                    )
+                }
+                IconButton(onClick = onHelp, modifier = Modifier.size(36.dp)) {
+                    Icon(Icons.Default.Help, contentDescription = "Leave / get help", tint = TextMuted)
+                }
+            }
             Spacer(Modifier.height(8.dp))
 
             // Tone bar

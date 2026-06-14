@@ -1,5 +1,6 @@
 package com.example.seen
 
+import com.example.seen.data.AppId
 import com.example.seen.data.GateState
 import com.example.seen.data.MiniGame
 import com.example.seen.data.gateState
@@ -93,13 +94,11 @@ class ProgressGatingTest {
 
     @Test
     fun `each mini-game is hosted by the correct app`() {
-        with(com.example.seen.data.AppId) {
-            assertEquals(MESSAGES, MiniGame.AFFECTION_OR_RED_FLAG.hostApp)
-            assertEquals(INSTAGRAM, MiniGame.LOCK_IT_DOWN.hostApp)
-            assertEquals(NOTES, MiniGame.TRACE_IT_BACK.hostApp)
-            assertEquals(MONITOR, MiniGame.IS_THIS_PHONE_CLEAN.hostApp)
-            assertEquals(CLIMAX, MiniGame.WHAT_DOES_SHE_DO.hostApp)
-        }
+        assertEquals(AppId.MESSAGES, MiniGame.AFFECTION_OR_RED_FLAG.hostApp)
+        assertEquals(AppId.INSTAGRAM, MiniGame.LOCK_IT_DOWN.hostApp)
+        assertEquals(AppId.NOTES, MiniGame.TRACE_IT_BACK.hostApp)
+        assertEquals(AppId.MONITOR, MiniGame.IS_THIS_PHONE_CLEAN.hostApp)
+        assertEquals(AppId.CLIMAX, MiniGame.WHAT_DOES_SHE_DO.hostApp)
     }
 
     // ── No game can be both UNLOCKED and COMPLETED simultaneously ───────────

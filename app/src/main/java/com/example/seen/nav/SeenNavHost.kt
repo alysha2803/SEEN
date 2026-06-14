@@ -17,11 +17,10 @@ fun SeenNavHost(
 ) {
     val state by vm.state.collectAsState()
 
-    // Determine start destination from saved progress
     val start = when {
         !state.acceptedContentWarning -> Routes.CONTENT_WARNING
-        state.finished -> Routes.RESOURCES
-        else -> Routes.LOCKSCREEN
+        state.finished                -> Routes.RESOURCES
+        else                          -> Routes.LOCKSCREEN
     }
 
     NavHost(navController = navController, startDestination = start) {
@@ -79,42 +78,57 @@ fun SeenNavHost(
             when (mg) {
                 MiniGame.AFFECTION_OR_RED_FLAG -> AffectionSwipe(
                     vm = vm,
+                    onHelp = { navController.navigate(Routes.RESOURCES) },
                     onComplete = { navController.popBackStack() }
                 )
-                MiniGame.LOCK_IT_DOWN -> MiniGameStub(
-                    title = "Lock it down",
-                    description = "Spot every piece of exposure in Aina's post. (Coming in Milestone 6.)",
-                    mg = mg,
+                MiniGame.LOCK_IT_DOWN -> LockItDown(
                     vm = vm,
+                    onHelp = { navController.navigate(Routes.RESOURCES) },
                     onComplete = { navController.popBackStack() }
                 )
-                MiniGame.TRACE_IT_BACK -> MiniGameStub(
-                    title = "Trace it back",
-                    description = "Match each thing he knew to the post that leaked it. (Coming in Milestone 6.)",
-                    mg = mg,
+                MiniGame.TRACE_IT_BACK -> TraceItBack(
                     vm = vm,
+                    onHelp = { navController.navigate(Routes.RESOURCES) },
                     onComplete = { navController.popBackStack() }
                 )
-                MiniGame.IS_THIS_PHONE_CLEAN -> MiniGameStub(
-                    title = "Is this phone clean?",
-                    description = "Spot the signs of device compromise. (Coming in Milestone 6.)",
-                    mg = mg,
+                MiniGame.IS_THIS_PHONE_CLEAN -> PhoneCheck(
                     vm = vm,
+                    onHelp = { navController.navigate(Routes.RESOURCES) },
                     onComplete = { navController.popBackStack() }
                 )
-                MiniGame.WHAT_DOES_SHE_DO -> MiniGameStub(
-                    title = "What does she do now?",
-                    description = "Guide the response. (Coming in Milestone 8.)",
-                    mg = mg,
+                MiniGame.WHAT_DOES_SHE_DO -> WhatDoesSheDo(
                     vm = vm,
-                    onComplete = { navController.popBackStack() }
+                    onHelp = { navController.navigate(Routes.RESOURCES) },
+                    onComplete = {
+                        navController.navigate(Routes.RESOLUTION) {
+                            // Pop the mini-game and CLIMAX app screens off the back stack
+                            popUpTo(Routes.HOME) { inclusive = false }
+                        }
+                    }
                 )
             }
         }
 
+        composable(Routes.RESOLUTION) {
+            ResolutionScreen(
+                onDone = {
+                    navController.navigate(Routes.RESOURCES) {
+                        popUpTo(Routes.RESOLUTION) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable(Routes.RESOURCES) {
             ResourcesScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                showReplay = state.finished,
+                onReplay = {
+                    vm.reset()
+                    navController.navigate(Routes.CONTENT_WARNING) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
+                }
             )
         }
     }

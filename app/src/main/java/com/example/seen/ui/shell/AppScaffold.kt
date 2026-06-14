@@ -121,9 +121,10 @@ fun AppScaffold(
                     gateState = gateState ?: GateState.LOCKED,
                     onTriggerTap = onTriggerTap
                 )
-                AppId.CLIMAX -> {
-                    // Handled separately in Milestone 8
-                }
+                AppId.CLIMAX -> ClimaxScreen(
+                    gateState = gateState ?: GateState.LOCKED,
+                    onTriggerTap = onTriggerTap
+                )
             }
         }
     }
